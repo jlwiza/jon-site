@@ -1,11 +1,11 @@
 import React, {Component}  from 'react'
 
-export default class NavBar extends Component {
+export default class Projects extends Component {
     render()
     {
         return (
             <div>
-            <h3> Who Knows </h3>
+            <h3>Hello from dfs the Projects Page!</h3>
             </div>
         )
     }
