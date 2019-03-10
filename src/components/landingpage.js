@@ -18,12 +18,20 @@ class LandingPage extends Component {
                 <h1>Full Stack Developer</h1>
                 <hr/>
 
-                <p>HTML/CSS | Bootstrap | Javascript | C/C++ | React.js</p>
+                <p>HTML/CSS | Bootstrap | Javascript | C/C++ | C# |.NET| React.js</p>
 
                 <div className="social-links">
-                <a href="http://google.com" target="blank">
-                <i className='fa fa-linkin-square' rel="noopener norefferrer" aria-hidden='true'/>
+
+                <a href="http://google.com" rel="noopener noreferrer" target="_blank">
+                <i className='fab fa-linkedin'  aria-hidden='true'/>
                 </a>
+
+                <a href="http://google.com" rel="noopener noreferrer" target="_blank">
+                <i className='fab fa-github-square'  aria-hidden='true'/>
+                </a>
+
+                
+
                 </div>
             </div>
             </Cell>
