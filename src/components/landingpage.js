@@ -37,7 +37,7 @@ class LandingPage extends Component {
             </Cell>
             </Grid>
           </div>
-          <video class='videoplayer' autoplay muted loop id='vidly'>
+          <video className='videoplayer' autoplay muted loop id='vidly'>
     <source   src = "http://img.mobiscroll.com/demos/trailer_iphone.m4v" type="video/x-m4v"/>
     </video>
         </React.Fragment>
