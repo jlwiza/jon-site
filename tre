@@ -1,0 +1,135 @@
+@model teleTest.Controllers.HomeController.UYFormModel;
+
+@{
+        ViewData["Title"] = "Home Page";
+}
+
+
+@*// this should be edit or create just because it does basically the same thing as create, just make it so it blocks off some functionality..
+    // maybe or even maybe not
+
+    // how the multiplication stuff works, well it doesnt it uses percentage.. or you enter how much the estimate will be*@
+<div class="placeholders mover">
+    <div class="placeHolderMine">
+        <div class="borderdBox">
+            <h3 style="margin-left:10px; letter-spacing:.1em; color:darkslategray">CREATE UNDERWRITING YEAR PLAN</h3>
+
+            <br />
+
+            <div class="placeholders mb-2">
+                <div class="placeHolderMine" style="font-size:20px;">
+                    <label style="flex-grow: 1">EPI Optimistic:<input id="epiO" /></label>
+                    <label style="flex-grow: 1">EPI Expected: <input id="epiE" /></label>
+                    <label style="flex-grow: 1">EPI Pessimistic: <input id="epiP" /></label>
+
+                    <div style="flex-grow:1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="placeholders mb-2">
+                <div class="placeHolderMine" style="font-size:20px;">
+
+                    <label style="flex-grow: 1">ELR Optimistic: <input id="elrO" /></label>
+                    <label style="flex-grow: 1">ELR Expected: <input id="elrE" /></label>
+                    <label style="flex-grow: 1">ELR Pessimistic: <input id="elrP" /></label>
+
+                    <div style="flex-grow:1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="placeholders mb-2">
+                <div class="placeHolderMine" style="font-size:20px;">
+
+                    <label style="flex-grow: 1">C&B  Optimistic: <input id="cbO" /></label>
+                    <label style="flex-grow: 1">C&B  Expected: <input id="cbE" /></label>
+                    <label style="flex-grow: 1">C&B Pessimistic: <input id="cbP" /></label>
+                    <div style="flex-grow:1">
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="placeholders mb-2">
+                <div class="placeHolderMine" style="font-size:20px;">
+                    <label style="flex-grow: 1">PFAD:<input id="pfad" /></label>
+                    <div style="flex-grow:1">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+
+<div class="blueBox">
+    <button class="btn aaps" onclick="save()" type="button"><span style="letter-spacing:.1em;">CREATE PLAN</span></button>
+</div>
+
+
+<div class="row">
+    <div class="col-12">
+        <div id="grid" @*style="width:150em"*@></div>
+        <script>
+
+                    var currYear = 2015;
+                    var numberOfMonths = 12;
+            function save() {
+
+
+                var planData = JSON.stringify({
+
+                    epiO: ($("#epiO").val() ? $("#epiO").val() : 0),
+                    epiE: ($("#epiE").val() ? $("#epiE").val() : 0),
+ //                   epiP: ($("#epiP").val() ? $("#epiP").val() : 0),
+ //                   elrO: ($("#epiE").val() ? $("#elrO").val() : 0),
+ //                   elrP: ($("#elrP").val() ? $("#elrP").val() : 0),
+ //cbO: ($("#cbO").val() ? $("#cbO").val() : 0),
+ //cbE: ($("#cbE").val() ? $("#cbE").val() : 0),
+ //cbP: ($("#cbP").val() ? $("#cbP").val() : 0),
+ //pfad: ($("#pfad").val() ? $("#pfad").val() : 0),
+                    val: @Model.valuation,
+                    vers:@Model.version,
+                    user:"@Model.userId"
+                });
+                               var service_url = site+"api/UYPlan/ChangePlan"
+$.ajax({
+                    url: service_url,
+                    type: 'POST',
+    dataType: 'json',
+    data: planData,
+                    contentType: 'application/json; charset=utf-8',
+                    xhrFields: {
+                    withCredentials: true
+                    }
+                    })
+                    .done(function (data) {
+                        //$('#result').text(data);
+                      //CreateGrid(data)
+                        var base = ["treaty:Treaty", "effDate:Current Effective Date", "expDate: Current Expiration Date", "cedent:Cedent", "uw:Underwriter", "alob:ALOB", "epi:EPI", "elr:ELR", "cb:C&B", "ecr:ECR", "planDate:Plan Date", "epIopt:EPI Optimistic", "elRopt:ELR Optimistic", "cBopt:C&B Optimistic", "epIpess:EPI Pessimistic", "elRpess:ELR Pessimistic", "cBpess:C&B Pessimistic", "epIexp:EPI Expected", "elRexp:ELR Expected", "cBexp:C&B Expected"];
+
+                         generateDataSource(data, base);
+                    })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        $('#result').text(textStatus);
+                    });
+    }
+
+
+
+
+
+                    $(document).ready(function () {
+
+                        var base = ["treaty:Treaty","effDate:Current Effective Date","expDate: Current Expiration Date","cedent:Cedent", "uw:Underwriter", "alob:ALOB", "epi:EPI", "elr:ELR", "cb:C&B","ecr:ECR","planDate:Plan Date", "epIopt:EPI Optimistic", "elRopt:ELR Optimistic", "cBopt:C&B Optimistic", "epIpess:EPI Pessimistic", "elRpess:ELR Pessimistic", "cBpess:C&B Pessimistic", "epIexp:EPI Expected", "elRexp:ELR Expected", "cBexp:C&B Expected" ]
+                        CreateKendoGrid(site+"api/UYPlan/"+@Model.valuation+"/"+@Model.version+"/"+"@Model.userId" ,base);
+
+                    });
+        </script>
+
+    </div>
+</div>
