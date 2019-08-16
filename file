@@ -1,0 +1,100 @@
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+
+<div class="placeholders mover">
+    <div class="placeHolderMine">
+        <div class="borderdBox">
+            <h3 style="margin-left:10px; letter-spacing:.1em; color:darkslategray">CREATE UNDERWRITING YEAR PLAN</h3>
+
+        </div>
+
+    </div>
+</div>
+
+<ul id="grid-context-menu">
+    <li>View Details</li>
+</ul>
+
+
+
+
+
+
+<div class="blueBox">
+    <button class="btn aaps" onclick="save()" type="button"><span style="letter-spacing:.1em;">View Details</span></button>
+</div>
+
+
+<div class="row">
+    <div class="col-12">
+        <div id="grid" @*style="width:150em"*@></div>
+        <script>
+
+            var currYear = 2015;
+            var numberOfMonths = 12;
+            function save() {
+                console.log("I am saving")
+            }
+
+
+
+
+
+            Date.prototype.yyyymmdd = function() {
+  var mm = this.getMonth() + 1; // getMonth() is zero-based
+  var dd = this.getDate();
+
+  return [this.getFullYear(),
+          (mm>9 ? '' : '0') + mm,
+          (dd>9 ? '' : '0') + dd
+         ].join('');
+};
+
+
+            function CreateGrid(e) {
+                // should this be a new window on select?
+                var tr = e.target.rowIndex;
+
+               
+                var o = data[tr];
+                var t = kendo.parseDate(o.valuationDate).yyyymmdd();
+               // data = grid.dataItem(tr);
+                var url = 'Home/Create';
+                var value = "value";
+                var form = $('<form action="' + url + '" method="post">' +
+                    '<input type="hidden" id="valuation" name="valuation" value="' + kendo.parseDate(o.valuationDate).yyyymmdd()+ '" />' +
+                    '<input type="hidden" id="version" name="version" value="' + kendo.parseDate(o.versionDate).yyyymmdd()  + '" />' +
+                    '<input type="hidden" id="userId" name="userId" value="' + o.userId+ '" />' +
+                    '<input name="__RequestVerificationToken" type="hidden" value="<token_generated_here>">' +
+                    '</form>');
+                $('body').append(form);
+                form.submit();
+            }
+
+
+            $(document).ready(function () {
+
+                
+            $("#grid-context-menu").kendoContextMenu({
+                target: "#grid",
+                filter: " tr",
+                select: CreateGrid
+            })
+
+
+
+
+                var base = ["valuationDate:Valuation Date", "versionDate:Version Date", "status:Status", "userId:User ID"];// ,"country:Country","currency:Currency", "cedent:Cedent", "uw:Underwriter", "alob:ALOB", "epi:EPI", "elr:ELR", "cb:CB", "ra:Ra Or Losses"]
+                CreateKendoGrid(site + "api/UYPlan", base);
+
+
+
+
+            });
+        </script>
+
+    </div>
+</div>
