@@ -1,165 +1,45 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using APIJSON.ViewModel;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+     var dataSource = new kendo.data.DataSource({
+              data: [{
+                ID: 1,
+                Type: "In Stock",
+                StockValue: 20,
+                Percentage: 10,
+                SalePrice: 10,
+                Amount: 10
+              }],             
+              batch: true,
+              schema: {
+                model: {
+                  id: "ID",
+                  fields: {
+                    ID: { type: "number" },
+                    Type: { type: "string" },
+                    StockValue: {type: "number"},
+                    Percentage: { type: "number"},
+                    SalePrice : { type: "number" },
+                    Amount: { type: "number", editable: false }
+                  }
+                }
+              },
+          	  change: function(e){
+                if (e.action === "itemchange" && e.field !== "Amount"){
+                  	var model = e.items[0],
+                        type = model.Type,
+                        currentValue = formulas[type](model);
+                   if (currentValue !== model.Amount) {
+                     	model.Amount = currentValue;
+                     	$("#grid").find("tr[data-uid='" + model.uid + "'] td:eq(4)").text(currentValue);                     	
+				   }
+				}
+		      }              
+                     
+            });
 
-namespace APIJSON.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UYPlanController : ControllerBase
-    {
-
-        UYPlanContext resultset = new UYPlanContext();
-        public UYPlanController()
-        {
-            
-
-            var res = new List<UYPlans>();
-            // it may be float but for now it doesnt matter 
-
-            using (StreamReader r = new StreamReader("uyPlan.json"))
-            {
-                string json = r.ReadToEnd();
-                res = JsonConvert.DeserializeObject<List<UYPlans>>(json);
-                resultset.UYPlansContext = res;
-            }
-            if (res.Count == 0)
-            {
-                resultset.GetSet();
-            }
-
-        }
-
-
-        public DateTime intToDate(int date)
-        {
-            int year = date / 10000;
-            int month = ((date - (10000 * year)) / 100);
-            int day = (date - (10000 * year) - (100 * month));
-
-            return new DateTime(year, month, day);
-        }
-
-        //Date Format: (yyyymmdd)
-        // GET: api/UYPlan/021310/021321/mYId
-        [HttpGet("{val}/{vers}/{id}")]
-        public IActionResult Get(int val, int vers, string id)
-        {
-
-
-            // so at this point we've posted the data and have the data on a new page
-            var ans = resultset.UYPlansContext.Where(x => x.ValuationDate == intToDate(val) &&
-                       x.versionDate == intToDate(vers) &&
-                       x.userId == id).FirstOrDefault();
-
-            
-            return Ok(ans.UYPrlans);
-        }
-        
-        
-        // GET: api/UYPlan/Create
-        [HttpGet]
-        public IActionResult GetCreateDB()
-        {
-            // this makes no sense
-            // may need some optimizations but it is not a problem right now
-            var thing = resultset.UYPlansContext;
-            var res = resultset.UYPlansContext.Select(x => new { ValuationDate = x.ValuationDate, VersionDate = x.versionDate, UserId = x.userId, status = x.status }).ToList();
-
-            return Ok(res);
-        }
-
-        // GET: api/UYPlan/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-
-        //var planData = JSON.stringify({
-        //            epiO: $("#epiO").val(),
-        //          epiE: $("#epiE").val(),
-        //          epiP: $("#epiP").val(),
-        //          elrO: $("#elrO").val(),
-        //          elrP: $("#elrP").val(),
-        //          cbO: $("#cbO").val(),
-        //          cbE: $("#cbE").val(),
-        //          cbP: $("#cbP").val(),
-        //          pfad: $("#pfad").val()
-        //        });
-        public class UYAPlan
-        {
-           // public int id { get; set; }
-            public float epiO { get; set; }
-            public float epiE { get; set; }
-            public float epiP { get; set; }
-            public float elrO { get; set; }
-            public float elrP { get; set; }
-            public float elrE { get; set; }
-            public float cbO { get; set; }
-            public float cbP { get; set; }
-            public float cbE { get; set; }
-            public float pfad { get; set; }
-            public int vers { get; set; }
-            public int val { get; set; }
-            public string user { get; set; }
-        }
-
-
-        // POST: api/UYPlan/ChangePlan
-        // I shouldnt do this as a post but... but i think its fine 
-        [HttpPost("ChangePlan")]
-        public IActionResult Post([FromBody] UYAPlan plan)
-        {
-
-            var ans = resultset.UYPlansContext.Where(x => x.ValuationDate == intToDate(plan.val) &&
-                       x.versionDate == intToDate(plan.vers) &&
-                       x.userId == plan.user).FirstOrDefault();
-
-
-            var res = ans.UYPrlans;
-            //m*(x)+x*r
-           var t =  res.Select(x => new
-            {
-                EffDate = x.EffDate,
-                ExpDate = x.ExpDate,
-                PlanDate = x.PlanDate,
-                EPIexp =plan.epiE, EPIpess = plan.epiP, EPIopt = plan.epiO,
-                EPI = x.EPI,
-                ELRexp = plan.elrE, ELRpess = plan.elrP, ELRopt = plan.elrO,
-                ELR = x.ELR,
-                ECR = x.ECR,
-                PFAD = plan.pfad,
-                CB = x.CB,
-                CBopt = plan.cbO,
-                CBpess = plan.cbP,
-                CBexp = plan.cbE,
-                Cedent = x.Cedent,
-                UW = x.UW,
-                Treaty = x.Treaty,
-                ALOB = x.ALOB
-     
-    }).ToList();
-            return Ok(t);
-        }
-
-        // PUT: api/UYPlan/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
-    }
-}
+        $("#grid").kendoGrid({
+          dataSource: dataSource,
+          columns: [
+                     { field: "Type", values: [{text:"In Stock", value: "In Stock"}, {text:"Purchase", value: "Purchase"}, {text:"Out Stock", value: "Out Stock"}, {text:"Credit", value: "Credit"}] },
+            "StockValue", "Percentage", "SalePrice", "Amount"],
+          editable: true
+        });
+      });
