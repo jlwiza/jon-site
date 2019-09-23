@@ -1,0 +1,79 @@
+
+        public async Task<List<ProductApiResponse>> GetProductsAsync()
+        {
+            string url = "https://localhost:44321/weatherforecast";
+            using (HttpClient client = new HttpClient())
+            {
+                var response = await client.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonString = await response.Content.ReadAsStringAsync();
+                    var res = JsonConvert.DeserializeObject<List<ProductApiResponse>>(jsonString);
+                    return res;
+                }
+
+                return null;
+            }
+
+        }
+        
+        
+        
+        
+  <TelerikRootComponent>
+
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+
+        <div class="main">
+            @Body
+        </div>
+
+    </TelerikRootComponent>
+        
+        
+        
+        
+        
+        
+        
+<TelerikGrid Data="products" Sortable="true" Pageable="true"
+             PageSize="100" Groupable="true" Height="600px" SelectionMode="@GridSelectionMode.Multiple" FilterMode="@GridFilterMode.FilterRow">
+    <GridColumns>
+        <GridColumn Field="@nameof(ProductApiResponse.Id)" />
+        <GridColumn Field="@nameof(ProductApiResponse.OrderNumber)"
+                    Title="Temperauture (F)" />
+        <GridColumn Field="@nameof(ProductApiResponse.CreditCardCode)" />
+        <GridColumn Field="@nameof(ProductApiResponse.billToAddressId)" />
+        <GridColumn Field="@nameof(ProductApiResponse.freight)" Title="Freight" />/>
+        <GridColumn Field="@nameof(ProductApiResponse.modifiedDate)" Title="Modified On" />/>
+        <GridColumn Field="@nameof(ProductApiResponse.Date)" />
+
+    </GridColumns>
+    <GridToolBar>
+        <GridCommandButton Command="Add" Icon="add">Add Command</GridCommandButton>
+    </GridToolBar>
+
+</TelerikGrid>
+
+@code {
+    List<ProductApiResponse> products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ForecastService.GetProductsAsync();
+    }
+
+    //  private void UpdateItem(GridCommandEventArgs args)
+    //{
+    //    var argsItem = args.Item as Person;
+    //    var index = GridData.FindIndex(i => i.EmployeeId == argsItem.EmployeeId);
+    //    if (index != -1)
+    //    {
+    //           GridData[index] = argsItem;
+    //    }
+    //}
+
+}
